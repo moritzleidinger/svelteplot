@@ -1,4 +1,4 @@
-import type { CurveName } from '../types/index.js';
+import type { AreaCurveName, CurveName } from '../types/index.js';
 import {
     curveBasis,
     curveBasisClosed,
@@ -52,7 +52,29 @@ const curves = new Map<
     ['step-before', curveStepBefore]
 ]);
 
-export function maybeCurve(curve: CurveName | CurveFactory = curveLinear, tension: number) {
+/**
+ * Returns the appropriate D3 curve factory based on the curve name or custom factory.
+ * Supports optional tension parameter for curves that accept it (cardinal, catmull-rom).
+ */
+// overloads
+export function maybeCurve(curve: 'bundle', tension?: number): CurveBundleFactory;
+export function maybeCurve(
+    curve: 'cardinal' | 'cardinal-closed' | 'cardinal-open',
+    tension?: number
+): CurveCardinalFactory;
+export function maybeCurve(
+    curve: 'catmull-rom' | 'catmull-rom-closed' | 'catmull-rom-open',
+    tension?: number
+): CurveCatmullRomFactory;
+export function maybeCurve(curve?: AreaCurveName, tension?: number): CurveFactory;
+export function maybeCurve(curve: CurveFactory, tension?: number): CurveFactory;
+export function maybeCurve(
+    curve?: CurveName | CurveFactory,
+    tension?: number
+): CurveFactory | CurveBundleFactory | CurveCardinalFactory | CurveCatmullRomFactory;
+
+// implementation
+export function maybeCurve(curve: CurveName | CurveFactory = curveLinear, tension?: number) {
     if (typeof curve === 'function') return curve; // custom curve
     const c = curves.get(`${curve}`.toLowerCase() as CurveName);
     if (!c) throw new Error(`unknown curve: ${curve}`);

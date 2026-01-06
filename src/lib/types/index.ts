@@ -29,6 +29,11 @@ export type CurveName =
     | 'step-after'
     | 'step-before';
 
+/**
+ * Curve names that are compatible with area generators. Excludes 'bundle' which only works with lines.
+ */
+export type AreaCurveName = Exclude<CurveName, 'bundle'>;
+
 export type MarkerOptions = {
     /**
      * the marker for the starting point of a line segment
