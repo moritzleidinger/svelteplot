@@ -57,17 +57,14 @@ const curves = new Map<
  * Supports optional tension parameter for curves that accept it (cardinal, catmull-rom).
  */
 // overloads
+// bundle curve only works with lines, not areas, so we want a more specific return type
 export function maybeCurve(curve: 'bundle', tension?: number): CurveBundleFactory;
+// all other curve factories are either of type CurveFactory or extend it
 export function maybeCurve(
-    curve: 'cardinal' | 'cardinal-closed' | 'cardinal-open',
+    curve: AreaCurveName | CurveFactory,
     tension?: number
-): CurveCardinalFactory;
-export function maybeCurve(
-    curve: 'catmull-rom' | 'catmull-rom-closed' | 'catmull-rom-open',
-    tension?: number
-): CurveCatmullRomFactory;
-export function maybeCurve(curve?: AreaCurveName, tension?: number): CurveFactory;
-export function maybeCurve(curve: CurveFactory, tension?: number): CurveFactory;
+): CurveFactory | CurveCardinalFactory | CurveCatmullRomFactory;
+// catch-all overload (needed e.g. for custom curve factories)
 export function maybeCurve(
     curve?: CurveName | CurveFactory,
     tension?: number
