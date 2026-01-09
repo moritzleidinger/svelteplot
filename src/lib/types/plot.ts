@@ -477,12 +477,12 @@ export type PlotOptions = {
     }>;
     /**
      * Options for the shared x scale.
-		 * Passing false will disable the scale, passing a RawValue[] array is a shorthand for passing the domain.
+     * Passing false will disable the scale, passing a RawValue[] array is a shorthand for passing the domain.
      */
     x: Partial<XScaleOptions> | false | RawValue[];
     /**
      * Options for the shared y scale
-		 * Passing false will disable the scale, passing a RawValue[] array is a shorthand for passing the domain.
+     * Passing false will disable the scale, passing a RawValue[] array is a shorthand for passing the domain.
      */
     y: Partial<YScaleOptions> | false | RawValue[];
     /**

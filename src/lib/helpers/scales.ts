@@ -152,16 +152,34 @@ export function computeScales(
     return { x, y, r, color, opacity, length, symbol, fx, fy, projection };
 }
 
-export function createScale<T extends ScaleOptions>(
+/**
+ * Internal scale options type that covers all possible properties.
+ * This is used after normalizing the input, before the scale factory is added.
+ */
+type InternalScaleOptions = Partial<ScaleOptions & { axis: false | string; scale: Function }>;
+
+
+/**
+ * Normalize scale options input to a consistent format.
+ * Handles: false (disabled), RawValue[] (domain shorthand), or partial options object.
+ */
+export function maybeScaleOptions(scaleOptions?: ScaleOptionsInput): InternalScaleOptions {
+    if (scaleOptions === false) return { axis: false };
+    if (Array.isArray(scaleOptions)) return { domain: scaleOptions };
+    return (scaleOptions ?? {}) as InternalScaleOptions;
+}
+
+export function createScale(
     name: ScaleName,
-    scaleOptions: T,
+    scaleOptionsInput: ScaleOptionsInput,
     marks: Mark<GenericMarkOptions>[],
     plotOptions: PlotOptions,
     plotWidth: number,
     plotHeight: number,
     plotHasFilledDotMarks: boolean,
     plotDefaults: PlotDefaults
-) {
+    const scaleOptions = maybeScaleOptions(scaleOptionsInput);
+
     if (!plotOptions.implicitScales && !scaleOptions.scale) {
         // no scale defined, return a dummy scale
         const fn = name === 'color' ? () => 'currentColor' : () => 0;

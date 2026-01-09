@@ -31,7 +31,17 @@ import type {
     RawValue,
     ScaleName,
     ScaleOptions,
-    ScaleType
+    ScaleType,
+    ContinuousScaleType,
+    TemporalScaleType,
+    BandScaleType,
+    PlotScaleFunction,
+    ColorScheme,
+    OrdinalScaleType,
+    ThresholdScaleType,
+    SequentialScaleType,
+    DivergingScaleType,
+    ColorScaleType
 } from '../types/index.js';
 import {
     categoricalSchemes,
@@ -48,40 +58,31 @@ import { interpolateLab, interpolateRound } from 'd3-interpolate';
 import { coalesce, maybeNumber } from './index.js';
 import { getLogTicks } from './getLogTicks.js';
 import { isPlainObject } from 'es-toolkit';
+import { asNumericDomain, asOrdinalDomain } from './typeGuards.js';
 
-const Scales: Record<
-    ScaleType,
-    (domain?: number[], range?: [number, number]) => (val: any) => any
-> = {
-    point: scalePoint,
-    band: scaleBand,
-    linear: scaleLinear,
-    time: scaleTime,
-    sqrt: scaleSqrt,
-    pow: scalePow,
-    log: scaleLog,
-    symlog: scaleSymlog,
-    ordinal: scaleOrdinal,
-    sequential: scaleSequential,
-    diverging: scaleDiverging
-};
+const ContinuousScales = {
+    linear: scaleLinear<RawValue>,
+    pow: scalePow<RawValue>,
+    sqrt: scaleSqrt<RawValue>,
+    log: scaleLog<RawValue>,
+    symlog: scaleSymlog<RawValue>
+} satisfies Record<ContinuousScaleType, any>;
 
-const SequentialScales = {
-    linear: scaleSequential,
-    log: scaleSequentialLog,
-    symlog: scaleSequentialSymlog,
-    pow: scaleSequentialPow,
-    sqrt: scaleSequentialSqrt,
-    'quantile-cont': scaleSequentialQuantile
-};
+const TemporalScales = {
+    time: scaleTime
+} satisfies Record<TemporalScaleType, any>;
 
-const DivergingScales = {
-    diverging: scaleDiverging,
-    'diverging-log': scaleDivergingLog,
-    'diverging-symlog': scaleDivergingSymlog,
-    'diverging-pow': scaleDivergingPow,
-    'diverging-sqrt': scaleDivergingSqrt
-};
+// are those ScaleTypes actually just synonyms for ordinal scales?
+const OrdinalScales = {
+    ordinal: scaleOrdinal<RawValue>,
+    categorical: scaleOrdinal<RawValue>,
+    cyclical: scaleOrdinal<RawValue>
+} satisfies Record<OrdinalScaleType, any>;
+
+const BandScales = {
+    point: scalePoint<NonNullable<RawValue>>,
+    band: scaleBand<NonNullable<RawValue>>
+} satisfies Record<BandScaleType, any>;
 
 const ThresholdScales = {
     // custom thresholds
@@ -89,7 +90,35 @@ const ThresholdScales = {
     // quantile scales
     quantize: scaleQuantize,
     quantile: scaleQuantile
-};
+} satisfies Record<ThresholdScaleType, any>;
+
+const SequentialScales = {
+    sequential: scaleSequential<RawValue>,
+    linear: scaleSequential<RawValue>,
+    log: scaleSequentialLog<RawValue>,
+    symlog: scaleSequentialSymlog<RawValue>,
+    pow: scaleSequentialPow<RawValue>,
+    sqrt: scaleSequentialSqrt<RawValue>,
+    'quantile-cont': scaleSequentialQuantile<RawValue>
+} satisfies Record<SequentialScaleType, any>;
+
+const DivergingScales = {
+    diverging: scaleDiverging<RawValue>,
+    'diverging-log': scaleDivergingLog<RawValue>,
+    'diverging-symlog': scaleDivergingSymlog<RawValue>,
+    'diverging-pow': scaleDivergingPow<RawValue>,
+    'diverging-sqrt': scaleDivergingSqrt<RawValue>
+} satisfies Record<DivergingScaleType, any>;
+
+const Scales = {
+    ...ContinuousScales,
+    ...TemporalScales,
+    ...OrdinalScales,
+    ...BandScales,
+    ...ThresholdScales,
+    ...SequentialScales,
+    ...DivergingScales
+} satisfies Record<ScaleType, any>;
 
 export function autoScale({
     name,
@@ -217,7 +246,7 @@ export function autoScaleColor({
     plotDefaults
 }: {
     name: ScaleName;
-    type: ScaleType;
+    type: ColorScaleType;
     domain: RawValue[];
     scaleOptions: ColorScaleOptions;
     plotOptions: PlotOptions;

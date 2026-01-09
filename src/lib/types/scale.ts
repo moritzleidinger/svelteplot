@@ -16,6 +16,67 @@ export type ScaleName =
     | 'fy'
     | 'projection';
 
+/**
+ * Scale types for continuous numeric domains (e.g., 0-100)
+ */
+export type ContinuousScaleType = 'linear' | 'pow' | 'sqrt' | 'log' | 'symlog';
+
+/**
+ * Scale types for temporal domains (Date values)
+ */
+export type TemporalScaleType = 'time';
+
+/**
+ * Scale types for ordinal/categorical domains (discrete values)
+ */
+export type OrdinalScaleType = 'ordinal' | 'categorical' | 'cyclical';
+
+/**
+ * Scale types for band/point positioning (discrete to continuous)
+ */
+export type BandScaleType = 'band' | 'point';
+
+/**
+ * Scale types for threshold/quantile-based binning
+ */
+export type ThresholdScaleType = 'threshold' | 'quantile' | 'quantize';
+
+/**
+ * Scale types for sequential color interpolation
+ */
+export type SequentialScaleType = 'sequential' | 'quantile-cont' | ContinuousScaleType;
+
+/**
+ * Scale types for diverging color interpolation
+ */
+export type DivergingScaleType =
+    | 'diverging'
+    | 'diverging-log'
+    | 'diverging-pow'
+    | 'diverging-sqrt'
+    | 'diverging-symlog';
+
+/**
+ * Color scale types (used for fill, stroke)
+ */
+export type ColorScaleType =
+    | OrdinalScaleType
+    | ThresholdScaleType
+    | SequentialScaleType
+    | DivergingScaleType;
+
+/**
+ * All possible scale types
+ */
+export type ScaleType =
+    | ContinuousScaleType
+    | TemporalScaleType
+    | OrdinalScaleType
+    | BandScaleType
+    | ThresholdScaleType
+    | SequentialScaleType
+    | DivergingScaleType;
+
 export type ScaleOptions = {
     /**
      * Override the automatic scale type detection.
@@ -86,23 +147,13 @@ export type ScaleOptions = {
           };
     // symlog scales
     constant: number;
+
+    // TODO: should this allow for a custom scale function to be passed??
 };
 
 export type ColorScaleOptions = ScaleOptions & {
     legend: boolean;
-    type:
-        | ScaleType
-        | 'categorical'
-        | 'sequential'
-        | 'cyclical'
-        | 'threshold'
-        | 'quantile'
-        | 'quantize'
-        | 'diverging'
-        | 'diverging-log'
-        | 'diverging-pow'
-        | 'diverging-sqrt'
-        | 'diverging-symlog';
+    type: ColorScaleType | 'auto';
     scheme: string;
     /**
      * fallback color used for null/undefined
@@ -122,29 +173,6 @@ export type ColorScaleOptions = ScaleOptions & {
      */
     tickFormat: false | Intl.NumberFormatOptions | ((d: RawValue) => string);
 };
-
-export type ScaleType =
-    | 'linear'
-    | 'pow'
-    | 'sqrt'
-    | 'log'
-    | 'symlog'
-    | 'time'
-    | 'point'
-    | 'ordinal'
-    | 'sequential'
-    | 'band'
-    | 'categorical'
-    | 'cyclical'
-    | 'threshold'
-    | 'quantile-cont'
-    | 'quantile'
-    | 'quantize'
-    | 'diverging'
-    | 'diverging-log'
-    | 'diverging-pow'
-    | 'diverging-sqrt'
-    | 'diverging-symlog';
 
 export type XScaleOptions = ScaleOptions & {
     /**
@@ -225,3 +253,16 @@ export type PlotScale = {
 };
 
 export type PlotScales = Record<ScaleName, PlotScale>;
+
+/**
+ * Input type for scale options as passed from PlotOptions.
+ * Can be partial options, false (to disable), or an array (as domain shorthand).
+ */
+export type ScaleOptionsInput =
+    | Partial<ScaleOptions>
+    | Partial<XScaleOptions>
+    | Partial<YScaleOptions>
+    | Partial<ColorScaleOptions>
+    | Partial<LegendScaleOptions>
+    | false
+    | RawValue[];
