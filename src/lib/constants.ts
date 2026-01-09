@@ -103,9 +103,9 @@ export const VALID_SCALE_TYPES: Record<ScaleName, Set<ScaleType>> = {
 };
 
 /**
- * Map of all scaled channels
+ * Map of all scaled channels (excluding projection which is not a regular scale)
  */
-export const CHANNEL_SCALE: Record<ScaledChannelName, ScaleName> = {
+export const CHANNEL_SCALE: Record<ScaledChannelName, Exclude<ScaleName, 'projection'>> = {
     x: 'x',
     x1: 'x',
     x2: 'x',
