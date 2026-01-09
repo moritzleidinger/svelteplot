@@ -9,7 +9,7 @@
         y1?: ChannelAccessor<Datum>;
         y2?: ChannelAccessor<Datum>;
         z?: ChannelAccessor<Datum>;
-        curve?: CurveName | CurveFactory;
+        curve?: AreaCurveName | CurveFactory;
         tension?: number;
         sort?: ConstantAccessor<RawValue> | { channel: 'stroke' | 'fill' };
         stack?: Partial<StackOptions>;
@@ -29,7 +29,7 @@
     import Anchor from './helpers/Anchor.svelte';
 
     import type {
-        CurveName,
+        AreaCurveName,
         DataRecord,
         BaseMarkProps,
         ConstantAccessor,
@@ -47,7 +47,7 @@
 
     const DEFAULTS = {
         fill: 'currentColor',
-        curve: 'linear' as CurveName,
+        curve: 'linear' as AreaCurveName,
         tension: 0,
         ...getPlotDefaults().area
     };
@@ -55,7 +55,7 @@
     const {
         data = [{} as Datum],
         /** the curve */
-        curve = 'linear' as CurveName,
+        curve = 'linear' as AreaCurveName,
         tension = 0,
         class: className = '',
         areaClass,
